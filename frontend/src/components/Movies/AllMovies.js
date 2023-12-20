@@ -10,7 +10,10 @@ const AllMovies = () => {
     getAllMovies()
       .then((data) => setMovies(data))
       .catch((err) => console.log(err));
+
+      console.log(movies);
   }, []);
+  console.log("Movies component - Movie IDs:", movies);
   return (
     <Box margin="auto" marginTop={4}>
       <Typography variant="h4" padding={2} textAlign="center">
@@ -27,7 +30,7 @@ const AllMovies = () => {
         {movies &&
           movies.map((movie, index) => (
             <CradLayout
-              id={movie._id}
+              id={movie.movieId}
               title={movie.title}
               releaseDate={movie.releaseDate}
               posterUrl={movie.posterUrl}

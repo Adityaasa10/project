@@ -68,6 +68,9 @@ export const getAllMovies = async (req, res, next) => {
 
   try {
     movies = await Movie.find();
+    movies.map((movie)=>{
+      movie.movieId=movie._id;
+    })
   } catch (err) {
     return console.log(err);
   }

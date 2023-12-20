@@ -2,100 +2,121 @@ import React, { useEffect, useState } from "react";
 import {
   AppBar,
   Autocomplete,
-  IconButton,
+  Box,
   Tab,
   Tabs,
   TextField,
   Toolbar,
 } from "@mui/material";
-import MovieIcon from "@mui/icons-material/Movie";
-import { Box } from "@mui/system";
+import MovieCreationIcon from "@mui/icons-material/MovieCreation";
 import { getAllMovies } from "../api-helpers/api-helpers";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { adminActions, userActions } from "../store/index";
+import { userActions } from "../store/index";
+import { adminActions } from "../store/index";
+
 const Header = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const isAdminLoggedIn = useSelector((state) => state.admin.isLoggedIn);
+  const [selectedMovie, setSelectedMovie] = useState("");
+  const [value, setValue] = useState(0);
+  const [data, setData] = useState([]);
   const isUserLoggedIn = useSelector((state) => state.user.isLoggedIn);
-  const [value, setValue] = useState();
-  const [movies, setMovies] = useState([]);
+  const isAdminLoggedIn = useSelector((state) => state.admin.isLoggedIn);
+  const dispatch = useDispatch();
+
   useEffect(() => {
     getAllMovies()
-      .then((data) => setMovies(data.movies))
+      .then((result) => {
+        // Ensure that result.movies is an array before setting it to data
+        if (Array.isArray(result.movies)) {
+          setData(result.movies);
+        } else {
+          setData([]);
+        }
+      })
       .catch((err) => console.log(err));
   }, []);
-  const logout = (isAdmin) => {
-    dispatch(isAdmin ? adminActions.logout() : userActions.logout());
-  };
   const handleChange = (e, val) => {
-    const movie = movies.find((m) => m.title === val);
+    setSelectedMovie(val);
+    const movie = data.find((mov) => mov.title === val);
     console.log(movie);
     if (isUserLoggedIn) {
-      navigate(`/booking/${movie._id}`);
+      navigate(`/booking/${movie?._id}`);
     }
   };
+
+  const authTabs = [
+    <Tab key="auth" to="/auth" component={NavLink} label="Auth" />,
+    <Tab key="admin" to="/admin" component={NavLink} label="Admin" />,
+  ];
+
+  const userTabs = [
+    <Tab key="user" to="/user" component={Link} label="User" />,
+    <Tab
+      key="logout"
+      onClick={() => dispatch(userActions.logout())}
+      component={Link}
+      to="/"
+      label="Logout"
+    />,
+  ];
+
+  const adminTabs = [
+    <Tab key="profile" to="/profile" component={Link} label="Profile" />,
+    <Tab key="add-movie" to="/add" component={Link} label="Add Movie" />,
+    <Tab
+      key="logout-admin"
+      onClick={() => dispatch(adminActions.logout())}
+      component={Link}
+      to="/"
+      label="Logout"
+    />,
+  ];
+
   return (
     <AppBar position="sticky" sx={{ bgcolor: "#2b2d42" }}>
       <Toolbar>
-        <Box width={"20%"}>
-          <IconButton LinkComponent={Link} to="/">
-            <MovieIcon />
-          </IconButton>
+        <Box width="20%">
+          <Link to="/" style={{ color: "white" }}>
+            <MovieCreationIcon />
+          </Link>
         </Box>
-        <Box width={"30%"} margin="auto">
-          <Autocomplete
-            onChange={handleChange}
-            freeSolo
-            options={movies && movies.map((option) => option.title)}
-            renderInput={(params) => (
-              <TextField
-                sx={{ input: { color: "white" } }}
-                variant="standard"
-                {...params}
-                placeholder="Search Acroos Multiple Movies"
-              />
-            )}
-          />
+        <Box width="50%" marginRight={"auto"} marginLeft="auto">
+            <Autocomplete
+              onChange={handleChange}
+              sx={{ borderRadius: 10, width: "40%", margin: "auto" }}
+              freeSolo
+              id="free-solo-2-demo"
+              disableClearable
+              options={data.map((option) => option.title)}
+              renderInput={(params) => (
+                <TextField
+                  sx={{
+                    borderRadius: 2,
+                    input: { color: "white" },
+                    bgcolor: "#2b2d42",
+                    padding: "6px",
+                  }}
+                  variant="standard"
+                  placeholder="Search Across Multiple Movies"
+                  {...params}
+                  InputProps={{
+                    ...params.InputProps,
+                    type: "search",
+                  }}
+                />
+              )}
+            />
         </Box>
-        <Box display={"flex"}>
+        <Box display="flex">
           <Tabs
-            textColor="inherit"
-            indicatorColor="secondary"
-            value={value}
             onChange={(e, val) => setValue(val)}
+            value={value}
+            textColor="inherit"
           >
-            <Tab LinkComponent={Link} to="/movies" label="Movies" />
-            {!isAdminLoggedIn && !isUserLoggedIn && (
-              <>
-                <Tab label="Admin" LinkComponent={Link} to="/admin" />
-                <Tab label="Auth" LinkComponent={Link} to="/auth" />
-              </>
-            )}
-            {isUserLoggedIn && (
-              <>
-                <Tab label="Profile" LinkComponent={Link} to="/user" />
-                <Tab
-                  onClick={() => logout(false)}
-                  label="Logout"
-                  LinkComponent={Link}
-                  to="/"
-                />
-              </>
-            )}
-            {isAdminLoggedIn && (
-              <>
-                <Tab label="Add Movie" LinkComponent={Link} to="/add" />
-                <Tab label="Profile" LinkComponent={Link} to="/user-admin" />
-                <Tab
-                  onClick={() => logout(true)}
-                  label="Logout"
-                  LinkComponent={Link}
-                  to="/"
-                />
-              </>
-            )}
+            {!isAdminLoggedIn && !isUserLoggedIn && authTabs}
+            {isUserLoggedIn && userTabs}
+            {isAdminLoggedIn && adminTabs}
           </Tabs>
         </Box>
       </Toolbar>

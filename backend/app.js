@@ -16,7 +16,7 @@ dotenv.config();
  //middlewares
 mongoose.connect("mongodb://adityaasa10:Aditya10@ac-jetkpkk-shard-00-00.u8runev.mongodb.net:27017,ac-jetkpkk-shard-00-01.u8runev.mongodb.net:27017,ac-jetkpkk-shard-00-02.u8runev.mongodb.net:27017/?ssl=true&replicaSet=atlas-hbwz3i-shard-0&authSource=admin&retryWrites=true&w=majority",{useNewUrlParser: true,useUnifiedTopology: true})
   .then(() =>
-    app.listen(9000, () =>
+    app.listen(8000, () =>
       console.log("Connected To Database And Server is running")
     )
   )

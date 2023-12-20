@@ -27,6 +27,9 @@ const movieSchema = new mongoose.Schema({
     ref: "Admin",
     required: true,
   },
+  movieId:{
+    type:String
+  },
 });
 
 export default mongoose.model("Movie", movieSchema);

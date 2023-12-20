@@ -61,7 +61,7 @@ const Header = () => {
                   padding: "6px",
                 }}
                 variant="standard"
-                placeholder="Search Across Multiple Movies"
+                placeholder="Search the Across Multiple Movies"
                 {...params}
                 InputProps={{
                   ...params.InputProps,
